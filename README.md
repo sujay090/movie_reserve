@@ -25,19 +25,19 @@ The service is built with **Fastify**, **TypeScript**, **PostgreSQL**, **Kysely*
 
 ## Technology Stack
 
-| Area | Technology |
-|---|---|
-| Runtime | Node.js 22 LTS |
-| Language | TypeScript |
-| HTTP framework | Fastify 5 |
-| Database | PostgreSQL 16 |
-| SQL access | Kysely |
-| Cache | Redis 7 |
-| Authentication | PostgreSQL-backed cookie sessions |
-| Password hashing | Argon2id |
-| API documentation | OpenAPI and Swagger UI |
-| Testing | Node test runner / integration tests |
-| Local infrastructure | Docker Compose |
+| Area                 | Technology                           |
+| -------------------- | ------------------------------------ |
+| Runtime              | Node.js 22 LTS                       |
+| Language             | TypeScript                           |
+| HTTP framework       | Fastify 5                            |
+| Database             | PostgreSQL 16                        |
+| SQL access           | Kysely                               |
+| Cache                | Redis 7                              |
+| Authentication       | PostgreSQL-backed cookie sessions    |
+| Password hashing     | Argon2id                             |
+| API documentation    | OpenAPI and Swagger UI               |
+| Testing              | Node test runner / integration tests |
+| Local infrastructure | Docker Compose                       |
 
 ## Architecture
 
@@ -118,17 +118,17 @@ cp .env.example .env
 
 ### Environment variables
 
-| Variable | Required | Example | Description |
-|---|---:|---|---|
-| `NODE_ENV` | No | `development` | Runtime environment |
-| `HOST` | No | `0.0.0.0` | HTTP bind host |
-| `PORT` | No | `3000` | HTTP port |
-| `DATABASE_URL` | Yes | `postgresql://movie:movie@localhost:5432/movie_reservation` | PostgreSQL connection string |
-| `REDIS_URL` | Yes | `redis://localhost:6379` | Redis connection string |
-| `SESSION_COOKIE_NAME` | No | `movie_session` | Session cookie name |
-| `SESSION_TTL_DAYS` | No | `7` | Session lifetime in days |
-| `ADMIN_EMAIL` | Seed only | `admin@example.com` | Initial administrator email |
-| `ADMIN_PASSWORD_HASH` | Seed only | Argon2id hash | Precomputed admin password hash |
+| Variable              |  Required | Example                                                     | Description                     |
+| --------------------- | --------: | ----------------------------------------------------------- | ------------------------------- |
+| `NODE_ENV`            |        No | `development`                                               | Runtime environment             |
+| `HOST`                |        No | `0.0.0.0`                                                   | HTTP bind host                  |
+| `PORT`                |        No | `3000`                                                      | HTTP port                       |
+| `DATABASE_URL`        |       Yes | `postgresql://movie:movie@localhost:5432/movie_reservation` | PostgreSQL connection string    |
+| `REDIS_URL`           |       Yes | `redis://localhost:6379`                                    | Redis connection string         |
+| `SESSION_COOKIE_NAME` |        No | `movie_session`                                             | Session cookie name             |
+| `SESSION_TTL_DAYS`    |        No | `7`                                                         | Session lifetime in days        |
+| `ADMIN_EMAIL`         | Seed only | `admin@example.com`                                         | Initial administrator email     |
+| `ADMIN_PASSWORD_HASH` | Seed only | Argon2id hash                                               | Precomputed admin password hash |
 
 Never commit `.env` or production secrets to source control. Production secrets should be provided through a secret manager or deployment environment.
 
@@ -223,14 +223,14 @@ Do not place a plaintext password in `ADMIN_PASSWORD_HASH`, logs, shell history,
 
 ## npm Scripts
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start Fastify in watch mode |
-| `npm run build` | Compile TypeScript to `dist/` |
-| `npm run start` | Start the compiled server |
-| `npm run migrate` | Apply Kysely migrations |
-| `npm run seed` | Seed the initial administrator |
-| `npm test` | Run the test suite |
+| Command           | Description                    |
+| ----------------- | ------------------------------ |
+| `npm run dev`     | Start Fastify in watch mode    |
+| `npm run build`   | Compile TypeScript to `dist/`  |
+| `npm run start`   | Start the compiled server      |
+| `npm run migrate` | Apply Kysely migrations        |
+| `npm run seed`    | Seed the initial administrator |
+| `npm test`        | Run the test suite             |
 
 ## API Documentation
 
@@ -244,142 +244,6 @@ OpenAPI JSON:
 
 ```text
 http://localhost:3000/docs/json
-```
-
-## API Overview
-
-All API routes use the `/api/v1` prefix unless noted otherwise.
-
-### System
-
-```http
-GET /health
-GET /api/v1/system/health
-GET /api/v1/system/metadata
-```
-
-The health endpoint checks PostgreSQL and Redis. It returns `200` when dependencies are healthy and `503` when the service is degraded.
-
-### Authentication
-
-```http
-POST /api/v1/auth/signup
-POST /api/v1/auth/login
-POST /api/v1/auth/logout
-GET  /api/v1/users/me
-```
-
-Authentication uses a server-side session:
-
-1. The user signs up or logs in.
-2. The server creates a random opaque session ID.
-3. Only a SHA-256 hash is stored in PostgreSQL.
-4. The raw session ID is sent in an HttpOnly cookie.
-5. Each request validates the cookie against the sessions table.
-
-Cookie properties:
-
-- `HttpOnly`
-- `SameSite=Lax`
-- `Secure` in production
-- Configurable `Max-Age`
-
-### Movies and genres
-
-```http
-GET  /api/v1/movies
-GET  /api/v1/movies/:movieId
-GET  /api/v1/genres
-POST /api/v1/admin/movies
-POST /api/v1/admin/genres
-```
-
-Movie list filters:
-
-```text
-?page=1
-&limit=20
-&search=example
-&genreId=<genre-id>
-```
-
-### Theaters, screens, and seats
-
-```http
-GET  /api/v1/theaters
-GET  /api/v1/theaters/:theaterId
-POST /api/v1/admin/theaters
-POST /api/v1/admin/screens
-POST /api/v1/admin/seats
-```
-
-### Showtimes
-
-```http
-GET  /api/v1/showtimes
-GET  /api/v1/showtimes/:showtimeId
-GET  /api/v1/showtimes/:showtimeId/seats
-POST /api/v1/admin/showtimes
-POST /api/v1/admin/showtimes/:showtimeId/cancel
-```
-
-Showtime filters:
-
-```text
-?date=2026-10-13
-&movieId=<movie-id>
-&theaterId=<theater-id>
-```
-
-PostgreSQL prevents overlapping scheduled showtimes on the same screen.
-
-### Reservations
-
-```http
-POST /api/v1/showtimes/:showtimeId/reservations
-GET  /api/v1/reservations/me
-GET  /api/v1/reservations/:reservationId
-POST /api/v1/reservations/:reservationId/cancel
-```
-
-Create a reservation:
-
-```http
-POST /api/v1/showtimes/{showtimeId}/reservations
-Content-Type: application/json
-Idempotency-Key: unique-request-key
-```
-
-```json
-{
-  "seatIds": [
-    "seat-uuid-1",
-    "seat-uuid-2"
-  ]
-}
-```
-
-Reservation creation is transactional. Requested seat rows are locked before availability is checked, preventing two users from reserving the same seat.
-
-### Admin users and reports
-
-```http
-GET   /api/v1/admin/users
-PATCH /api/v1/admin/users/:userId/role
-PATCH /api/v1/admin/users/:userId/status
-
-GET /api/v1/admin/reports/reservations
-GET /api/v1/admin/reports/revenue
-GET /api/v1/admin/reports/capacity
-```
-
-Admin report filters:
-
-```text
-?from=2026-10-01
-&to=2026-10-31
-&movieId=<movie-id>
-&theaterId=<theater-id>
 ```
 
 ## Response Format
@@ -406,16 +270,16 @@ Errors use stable application codes:
 
 Common status codes:
 
-| Status | Meaning |
-|---|---|
-| `400` | Invalid request |
-| `401` | Missing or invalid session |
-| `403` | Insufficient permissions |
-| `404` | Resource not found |
-| `409` | Seat or scheduling conflict |
-| `422` | Schema validation error |
-| `500` | Unexpected server error |
-| `503` | Dependency or service unavailable |
+| Status | Meaning                           |
+| ------ | --------------------------------- |
+| `400`  | Invalid request                   |
+| `401`  | Missing or invalid session        |
+| `403`  | Insufficient permissions          |
+| `404`  | Resource not found                |
+| `409`  | Seat or scheduling conflict       |
+| `422`  | Schema validation error           |
+| `500`  | Unexpected server error           |
+| `503`  | Dependency or service unavailable |
 
 ## Reservation Consistency
 
