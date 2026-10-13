@@ -9,6 +9,12 @@ import { closeDatabase } from "./db/database.js";
 import { registerSessionAuth } from "./auth/session.js";
 import { registerAuthRoutes } from "./auth/routes.js";
 import { registerSystemRoutes } from "./system/routes.js";
+import { registerMovieRoutes } from "./movies/routes.js";
+import { registerVenueRoutes } from "./venues/routes.js";
+import { registerShowtimeRoutes } from "./showtimes/routes.js";
+import { registerReservationRoutes } from "./reservations/routes.js";
+import { registerReportRoutes } from "./reports/routes.js";
+import { registerAdminRoutes } from "./admin/routes.js";
 
 export function buildApp() {
   const app = Fastify({
@@ -56,6 +62,12 @@ export function buildApp() {
   app.register(registerAuthRoutes);
 
   app.register(registerSystemRoutes);
+  app.register(registerMovieRoutes);
+  app.register(registerVenueRoutes);
+  app.register(registerShowtimeRoutes);
+  app.register(registerReservationRoutes);
+  app.register(registerReportRoutes);
+  app.register(registerAdminRoutes);
 
   app.addHook("onClose", async () => {
     await closeDatabase();
