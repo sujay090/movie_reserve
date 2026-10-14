@@ -124,7 +124,11 @@ cp .env.example .env
 | `HOST`                |        No | `0.0.0.0`                                                   | HTTP bind host                  |
 | `PORT`                |        No | `3000`                                                      | HTTP port                       |
 | `DATABASE_URL`        |       Yes | `postgresql://movie:movie@localhost:5432/movie_reservation` | PostgreSQL connection string    |
-| `REDIS_URL`           |       Yes | `redis://localhost:6379`                                    | Redis connection string         |
+| `POSTGRES_DB`         | Compose   | `movie_reservation`                                         | PostgreSQL database name        |
+| `POSTGRES_USER`       | Compose   | `movie_app`                                                  | PostgreSQL application user     |
+| `POSTGRES_PASSWORD`   | Compose   | Long random value                                            | PostgreSQL password             |
+| `REDIS_PASSWORD`      | Compose   | Long random value                                            | Redis password                  |
+| `REDIS_URL`           |       Yes | Authenticated Redis connection string                       | Redis connection string         |
 | `SESSION_COOKIE_NAME` |        No | `movie_session`                                             | Session cookie name             |
 | `SESSION_TTL_DAYS`    |        No | `7`                                                         | Session lifetime in days        |
 | `ADMIN_EMAIL`         | Seed only | `admin@example.com`                                         | Initial administrator email     |

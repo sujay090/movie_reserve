@@ -7,6 +7,7 @@ import {
   destroySession,
   setSessionCookie,
 } from "./session.js";
+import { env } from "../config/env.js";
 
 interface CredentialsBody {
   email: string;
@@ -159,7 +160,7 @@ export async function registerAuthRoutes(app: FastifyInstance): Promise<void> {
     },
     async (request, reply) => {
       const sessionId =
-        request.cookies[process.env.SESSION_COOKIE_NAME ?? "movie_session"];
+        request.cookies[env.sessionCookieName];
       if (sessionId) await destroySession(sessionId);
       clearSessionCookie(reply);
       return reply.send({ data: { loggedOut: true }, requestId: request.id });
