@@ -9,7 +9,7 @@
     "start": "node dist/server.js",
     "migrate": "tsx src/db/migrate.ts",
     "seed": "tsx src/db/seed.ts",
-    "test": "node --test"
+    "test": "node --import tsx --test test/**/*.test.ts"
   },
   "dependencies": {
     "argon2": "^0.41.1",
