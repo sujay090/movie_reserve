@@ -376,6 +376,54 @@ Dependency audit:
 npm audit --omit=dev --audit-level=high
 ```
 
+## CI/CD
+
+The GitHub Actions workflow at `.github/workflows/ci-cd.yml` runs on pull requests and pushes to `main`.
+
+### CI checks
+
+The validation job:
+
+1. Starts PostgreSQL 16 and Redis 7 services.
+2. Installs dependencies with `npm ci`.
+3. Applies Kysely migrations.
+4. Builds the TypeScript application.
+5. Runs the test suite.
+6. Audits production dependencies.
+7. Validates Docker Compose configuration.
+
+### Container publishing
+
+Successful pushes to `main` publish an image to GitHub Container Registry:
+
+```text
+ghcr.io/<owner>/<repository>:latest
+ghcr.io/<owner>/<repository>:sha-<commit>
+```
+
+The workflow uses the built-in `GITHUB_TOKEN` and does not require a registry password. Package write permission is limited to the image job.
+
+### Production deployment
+
+The deploy job targets the GitHub `production` environment. Configure the following environment secret to enable deployment:
+
+```text
+DEPLOY_WEBHOOK_URL
+```
+
+The webhook receives the published image, immutable image digest, and commit SHA as JSON. If the secret is not configured, the image is still published and deployment is explicitly skipped rather than failing.
+
+The webhook service should:
+
+1. Authenticate the request.
+2. Pull the image by digest.
+3. Run database migrations once.
+4. Perform a rolling API deployment.
+5. Wait for `/api/v1/system/health` to return healthy.
+6. Roll back if health checks fail.
+
+Configure required production secrets through GitHub Environments or an external secret manager. Never place deployment credentials in workflow files.
+
 ## Design Documents
 
 - [High-Level Design](./HLD.md)

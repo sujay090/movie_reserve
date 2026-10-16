@@ -16,7 +16,15 @@ import { registerReservationRoutes } from "./reservations/routes.js";
 import { registerReportRoutes } from "./reports/routes.js";
 import { registerAdminRoutes } from "./admin/routes.js";
 
-export function buildApp() {
+export interface BuildAppOptions {
+  /**
+   * Tests can keep the process-wide database/cache clients alive while
+   * closing an individual Fastify instance.
+   */
+  closeResources?: boolean;
+}
+
+export function buildApp(options: BuildAppOptions = {}) {
   const app = Fastify({
     logger: {
       level: env.nodeEnv === "production" ? "info" : "debug",
@@ -42,7 +50,10 @@ export function buildApp() {
       ],
       tags: [
         { name: "System", description: "Service health and metadata" },
-        { name: "Authentication", description: "Cookie-session authentication" },
+        {
+          name: "Authentication",
+          description: "Cookie-session authentication",
+        },
         { name: "Movies", description: "Movie catalog operations" },
         { name: "Showtimes", description: "Showtime and seat operations" },
         { name: "Reservations", description: "Seat reservation operations" },
@@ -69,9 +80,11 @@ export function buildApp() {
   app.register(registerReportRoutes);
   app.register(registerAdminRoutes);
 
-  app.addHook("onClose", async () => {
-    await closeDatabase();
-  });
+  if (options.closeResources !== false) {
+    app.addHook("onClose", async () => {
+      await closeDatabase();
+    });
+  }
 
   return app;
 }

@@ -159,8 +159,7 @@ export async function registerAuthRoutes(app: FastifyInstance): Promise<void> {
       },
     },
     async (request, reply) => {
-      const sessionId =
-        request.cookies[env.sessionCookieName];
+      const sessionId = request.cookies[env.sessionCookieName];
       if (sessionId) await destroySession(sessionId);
       clearSessionCookie(reply);
       return reply.send({ data: { loggedOut: true }, requestId: request.id });
