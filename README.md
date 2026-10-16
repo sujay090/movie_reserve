@@ -123,10 +123,7 @@ cp .env.example .env
 | `NODE_ENV`            |        No | `development`                                               | Runtime environment             |
 | `HOST`                |        No | `0.0.0.0`                                                   | HTTP bind host                  |
 | `PORT`                |        No | `3000`                                                      | HTTP port                       |
-| `DATABASE_URL`        |       Yes | `postgresql://movie:movie@localhost:5432/movie_reservation` | PostgreSQL connection string    |
-| `POSTGRES_DB`         | Compose   | `movie_reservation`                                         | PostgreSQL database name        |
-| `POSTGRES_USER`       | Compose   | `movie_app`                                                  | PostgreSQL application user     |
-| `POSTGRES_PASSWORD`   | Compose   | Long random value                                            | PostgreSQL password             |
+| `DATABASE_URL`        |       Yes | `postgresql://user:password@remote-host:5432/database` | Remote PostgreSQL connection string |
 | `REDIS_PASSWORD`      | Compose   | Long random value                                            | Redis password                  |
 | `REDIS_URL`           |       Yes | Authenticated Redis connection string                       | Redis connection string         |
 | `SESSION_COOKIE_NAME` |        No | `movie_session`                                             | Session cookie name             |
@@ -138,7 +135,7 @@ Never commit `.env` or production secrets to source control. Production secrets 
 
 ## Run with Docker Compose
 
-Start the API, PostgreSQL, and Redis:
+Start the API and Redis. PostgreSQL is provided by the configured remote `DATABASE_URL`:
 
 ```bash
 docker compose up --build
@@ -156,7 +153,7 @@ Stop the services:
 docker compose down
 ```
 
-Remove local database and Redis volumes:
+Remove the local Redis volume:
 
 ```bash
 docker compose down -v

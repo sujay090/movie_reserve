@@ -193,7 +193,7 @@ The worker must be idempotent because jobs can be delivered more than once.
 
 ### Environments
 
-- **Development:** Docker Compose with Fastify API, PostgreSQL, and Redis.
+- **Development:** Docker Compose with Fastify API and Redis, connected to the configured remote PostgreSQL database.
 - **Test:** Isolated database per test run or ephemeral database container.
 - **Staging:** Production-like infrastructure with test data.
 - **Production:** Managed PostgreSQL, load balancer, multiple API instances, object storage, monitoring, and automated backups.
@@ -789,7 +789,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgresql://movie:movie@postgres:5432/movie_reservation
+      DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       SESSION_COOKIE_NAME: movie_session
       SESSION_TTL_DAYS: 7
@@ -797,24 +797,8 @@ services:
       - .:/app
       - /app/node_modules
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_started
-
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -823,7 +807,6 @@ services:
       - redis_data:/data
 
 volumes:
-  postgres_data:
   redis_data:
 ```
 

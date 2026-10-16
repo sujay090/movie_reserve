@@ -614,7 +614,7 @@ GET    /admin/reports/revenue
 
 ## 17. Docker Compose
 
-`docker-compose.yml` should provide the Fastify API, PostgreSQL, and Redis for local development:
+`docker-compose.yml` should provide the Fastify API and Redis for local development. PostgreSQL is provided by the configured remote database:
 
 ```yaml
 services:
@@ -628,7 +628,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgresql://movie:movie@postgres:5432/movie_reservation
+      DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       SESSION_COOKIE_NAME: movie_session
       SESSION_TTL_DAYS: 7
@@ -636,24 +636,8 @@ services:
       - .:/app
       - /app/node_modules
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_started
-
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -662,7 +646,6 @@ services:
       - redis_data:/data
 
 volumes:
-  postgres_data:
   redis_data:
 ```
 
